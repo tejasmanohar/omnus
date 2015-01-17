@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/public/*.mp3'));
 var bodyParser = require('body-parser');
 app.use(bodyParser());
 
@@ -13,7 +13,7 @@ var client = new twilio.RestClient(process.env.AUTH_SID, process.env.AUTH_TOKEN)
 
 var port = process.env.PORT || 3000;
 server.listen(port);
-console.log("Listening at port: " + port);
+console.log('Listening at port: ' + port);
 
 app.get('/', function(req, res) {
   res.sendStatus(200);
@@ -30,7 +30,7 @@ app.all('/receive', function(req, res) {
   var call = client.calls.create({
     to: req.body.From,
     from: process.env.NUMBER,
-    url:"http://call-stream-184860.use1.nitrousbox.com/xml/yo.mp3"});
+    url: 'http://call-stream-184860.use1.nitrousbox.com/xml/yo.mp3'});
 
 
   res.sendStatus(200);
