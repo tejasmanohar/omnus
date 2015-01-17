@@ -40,7 +40,7 @@ app.all('/receive', function(req, res) {
       from: process.env.NUMBER,
       url: baseUrl + '/xml/' + url
     });
-    exec('youtube-dl --extract-audio --audio-format mp3' + url);
+    exec('youtube-dl --extract-audio --audio-format mp3 -o "tmp/%(id)s.%(ext)s"' + url);
   }
 
   res.sendStatus(200);
@@ -50,7 +50,6 @@ app.post('/xml/:id', function(req, res) {
   res.set('Content-Type', 'text/xml');
   res.send('<Response><Play>' + baseUrl + req.params.id + '.mp3' + '</Play><Redirect/></Response>');
 });
-
 
 function search(query, cb) {
   request
