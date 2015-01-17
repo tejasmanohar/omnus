@@ -38,15 +38,14 @@ app.all('/receive', function(req, res) {
     from: process.env.NUMBER,
     url: baseUrl + '/xml/' + });
 
-
   res.sendStatus(200);
 });
 
 
 // USE THIS LATER FOR COMPRESSION
-app.post('/xml/:file', function(req, res) {
+app.post('/xml/:id', function(req, res) {
   res.set('Content-Type', 'text/xml');
-  res.send('<Response><Play>http://com.twilio.music.ambient.s3.amazonaws.com/gurdonark_-_Exurb.mp3</Play><Redirect/></Response>');
+  res.send('<Response><Play>' + baseUrl + req.params.id + '.mp3' + '</Play><Redirect/></Response>');
 });
 
 
