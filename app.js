@@ -20,7 +20,7 @@ console.log('Listening at port: ' + port);
 if(process.env.NODE_ENV === 'PRODUCTION') {
   var baseUrl = 'domain.com';
 } else {
-  var baseUrl = 'localhost:' + port;
+  var baseUrl = 'http://46cfc4a8.ngrok.com';
 }
 
 app.get('/', function(req, res) {
@@ -35,20 +35,22 @@ app.all('/receive', function(req, res) {
   });
   
   function startCall(url) {
-    var call = client.calls.create({
-      to: req.body.From,
-      from: process.env.NUMBER,
-      url: baseUrl + '/xml/' + url.substring(url.length - 11)
-    });
-    exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 -o "tmp/%(id)s.%(ext)s" ' + url);
+    if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
+      var call = client.calls.create({
+        to: req.body.From,
+        from: process.env.NUMBER,
+        url: baseUrl + '/xml/' + url.substring(url.length - 11)
+      });
+    }
+    return;
   }
 
   res.sendStatus(200);
 });
 
-app.post('/xml/:id', function(req, res) {
+app.all('/xml/:id', function(req, res) {
   res.set('Content-Type', 'text/xml');
-  res.send('<Response><Play>' + baseUrl + req.params.id + '.mp3' + '</Play><Redirect/></Response>');
+  res.send('<Response><Play>' + baseUrl + '/' + req.params.id + '.mp3' + '</Play><Redirect/></Response>');
 });
 
 function search(query, cb) {
