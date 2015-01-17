@@ -15,7 +15,7 @@ var twilio = require('twilio');
 
 require('shelljs/global');
 
-var phoneClient = new twilio.RestClient(process.env.TWILIO_AUTH_SID, process.env.TWILIO_AUTH_TOKEN);
+var client = new twilio.RestClient(process.env.TWILIO_AUTH_SID, process.env.TWILIO_AUTH_TOKEN);
 
 var port = process.env.PORT || 3000;
 server.listen(port);
@@ -38,7 +38,7 @@ app.post('/phone-receive', function(req, res) {
 
   function startCall(url) {
     if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 --audio-quality 9 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
-      var call = phoneClient.calls.create({
+      var call = client.calls.create({
         to: req.body.From,
         from: process.env.PHONE_NUMBER,
         url: baseUrl + '/xml/' + url.substring(url.length - 11)
@@ -57,24 +57,23 @@ app.post('/app-receive', function(req, res) {
   function startTransfer(url) {
     if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 --audio-quality 9 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
       fs.readFile('tmp/' + url.substring(url.length - 11) + '.mp3', function(err, data) {
-        var str = data.toString('base64');       
+        var str = data.toString('base64');
+        for(var i = 0; i < str.length; i += 3000) {
+          client.sendMessage({
+              to: req.body.From,
+              body: '',
+              mediaUrl: 'http://api.qrserver.com/v1/create-qr-code/?data=' + str.substring(i, Math.min(str.length, i + 3000)),
+              from: process.env.APP_NUMBER,
+            }, function(err, messageData) {
+                if (err) {
+                  console.log(err);
+                } else {
+                  console.log(messageData.status);
+                }
+            });
+        }
       });
     }
-  }
-
-  for(var i = 0; i < str.length; i += 3000) {
-    client.sendMessage({
-        to: req.body.From,
-        body: '',
-        mediaUrl: 'http://api.qrserver.com/v1/create-qr-code/?data=' + str.substring(i, Math.min(str.length, i + 3000)),
-        from: process.env.APP_NUMBER,
-      }, function(err, messageData) {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log("success\n" + messageData)
-          }
-      });
   }
 
   res.send('complete');
