@@ -41,8 +41,6 @@ app.all('/receive', function(req, res) {
   res.sendStatus(200);
 });
 
-
-// USE THIS LATER FOR COMPRESSION
 app.post('/xml/:id', function(req, res) {
   res.set('Content-Type', 'text/xml');
   res.send('<Response><Play>' + baseUrl + req.params.id + '.mp3' + '</Play><Redirect/></Response>');
