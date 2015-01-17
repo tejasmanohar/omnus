@@ -1,3 +1,6 @@
+var dotenv = require('dotenv');
+dotenv.load();
+
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
@@ -11,7 +14,7 @@ var twilio = require('twilio');
 
 require('shelljs/global');
 
-var client = new twilio.RestClient(process.env.AUTH_SID, process.env.AUTH_TOKEN);
+var phoneClient = new twilio.RestClient(process.env.TWILIO_AUTH_SID, process.env.TWILIO_AUTH_TOKEN);
 
 var port = process.env.PORT || 3000;
 server.listen(port);
@@ -27,7 +30,7 @@ app.get('/', function(req, res) {
   res.sendStatus(200);
 });
 
-app.all('/receive', function(req, res) {
+app.post('/phone-receive', function(req, res) {
   var searchSong = req.body.Body;
 
   search(searchSong, function(url) {
@@ -35,10 +38,10 @@ app.all('/receive', function(req, res) {
   });
   
   function startCall(url) {
-    if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
+    if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 --audio-quality 9 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
       var call = client.calls.create({
         to: req.body.From,
-        from: process.env.NUMBER,
+        from: process.env.PHONE_NUMBER,
         url: baseUrl + '/xml/' + url.substring(url.length - 11)
       });
     }
@@ -48,7 +51,12 @@ app.all('/receive', function(req, res) {
   res.sendStatus(200);
 });
 
-app.all('/xml/:id', function(req, res) {
+app.post('/app-receive', function(req, res) {
+  // ...
+  res.sendStatus(200);
+});
+
+app.post('/xml/:id', function(req, res) {
   res.set('Content-Type', 'text/xml');
   res.send('<Response><Play>' + baseUrl + '/' + req.params.id + '.mp3' + '</Play><Redirect/></Response>');
 });
