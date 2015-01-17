@@ -15,6 +15,12 @@ var port = process.env.PORT || 3000;
 server.listen(port);
 console.log('Listening at port: ' + port);
 
+if(process.env.NODE_ENV === 'production') {
+  var baseUrl = 'domain.com';
+} else {
+  var baseUrl = 'localhost:' + port;
+}
+
 app.get('/', function(req, res) {
   res.sendStatus(200);
 });
@@ -30,7 +36,7 @@ app.all('/receive', function(req, res) {
   var call = client.calls.create({
     to: req.body.From,
     from: process.env.NUMBER,
-    url: 'http://call-stream-184860.use1.nitrousbox.com/xml/yo.mp3'});
+    url: baseUrl + '/xml/' + });
 
 
   res.sendStatus(200);
@@ -44,17 +50,17 @@ app.post('/xml/:file', function(req, res) {
 });
 
 
-function search(query1, cb) {
+function search(query, cb) {
   request
-    .get('http://partysyncwith.me:3005/search/'+ query1 +'/1')
+    .get('http://partysyncwith.me:3005/search/'+ query +'/1')
     .end(function(err, res) {
       if(err) {
         console.log(err);
       } else {
         if (typeof JSON.parse(res.text).data !== 'undefined') {
             if (JSON.parse(res.text).data[0].duration < 600) {
-              var query = JSON.parse(res.text).data[0].video_url;
-              cb(query);
+              var url = JSON.parse(res.text).data[0].video_url;
+              cb(url);
            } else {
               cb(null);
            }
