@@ -25,7 +25,6 @@ app.all('/receive', function(req, res) {
   })
   
   
-  
   var call = client.calls.create({
     to: "+14806488254",
     from: process.env.NUMBER,
@@ -36,6 +35,7 @@ app.all('/receive', function(req, res) {
 });
 
 
+// USE THIS LATER FOR COMPRESSION
 app.post('/xml/:file', function(req, res) {
 //   console.log(req.param("file"));
   res.set('Content-Type', 'text/xml');
@@ -61,10 +61,6 @@ function search(query1, cb) {
       }
     })
 }
-
-// search('pennapps', function(q) {(q);
-// })
-
 
 
 
