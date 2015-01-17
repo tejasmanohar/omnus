@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
-app.use(express.static(__dirname + '/public/*.mp3'));
+app.use(express.static(__dirname + '/public'));
 var bodyParser = require('body-parser');
 app.use(bodyParser());
 
