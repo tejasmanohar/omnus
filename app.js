@@ -43,23 +43,22 @@ app.post('/phone-receive', function(req, res) {
         url: baseUrl + '/xml/' + url.substring(url.length - 11)
       });
     }
-    return;
   }
 
   res.sendStatus(200);
 });
 
 app.post('/app-receive', function(req, res) {
-   // search(req.body.Body, function(url) {
-  //   startCall(url);
-  // });
+   search(req.body.Body, function(url) {
+    startCall(url);
+  });
 
-  // function startCall(url) {
-  //   if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 --audio-quality 9 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
-
-  //   }
-  //   return;
-  // }
+  function startCall(url) {
+    if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 --audio-quality 9 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
+      
+    }
+    return;
+  }
 
   res.send('complete');
 });
