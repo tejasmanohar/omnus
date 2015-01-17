@@ -38,7 +38,7 @@ app.all('/receive', function(req, res) {
     var call = client.calls.create({
       to: req.body.From,
       from: process.env.NUMBER,
-      url: baseUrl + '/xml/' + url
+      url: baseUrl + '/xml/' + url.substring(url.length - 11)
     });
     exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 -o "tmp/%(id)s.%(ext)s"' + url);
   }
