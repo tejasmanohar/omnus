@@ -5,9 +5,11 @@ app.use(express.static(__dirname + '/public'));
 var bodyParser = require('body-parser');
 app.use(bodyParser());
 
-var request = require('superagent');
 var async = require('async');
+var request = require('superagent');
 var twilio = require('twilio');
+
+require('shelljs/global');
 
 var client = new twilio.RestClient(process.env.AUTH_SID, process.env.AUTH_TOKEN);
 
