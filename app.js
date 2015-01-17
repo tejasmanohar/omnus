@@ -1,7 +1,7 @@
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
-app.use(express.static(__dirname + '/public'));
+app.use(express.static(__dirname + '/tmp'));
 var bodyParser = require('body-parser');
 app.use(bodyParser());
 
@@ -17,7 +17,7 @@ var port = process.env.PORT || 3000;
 server.listen(port);
 console.log('Listening at port: ' + port);
 
-if(process.env.NODE_ENV === 'production') {
+if(process.env.NODE_ENV === 'PRODUCTION') {
   var baseUrl = 'domain.com';
 } else {
   var baseUrl = 'localhost:' + port;
@@ -30,15 +30,18 @@ app.get('/', function(req, res) {
 app.all('/receive', function(req, res) {
   var searchSong = req.body.Body;
 
-  search(searchSong, function(q) {
-    console.log(q);
+  search(searchSong, function(url) {
+    startCall(url);
   });
   
-  
-  var call = client.calls.create({
-    to: req.body.From,
-    from: process.env.NUMBER,
-    url: baseUrl + '/xml/' + });
+  function startCall(url) {
+    var call = client.calls.create({
+      to: req.body.From,
+      from: process.env.NUMBER,
+      url: baseUrl + '/xml/' + url
+    });
+    exec('youtube-dl --extract-audio --audio-format mp3' + url);
+  }
 
   res.sendStatus(200);
 });
@@ -54,7 +57,7 @@ function search(query, cb) {
     .get('http://partysyncwith.me:3005/search/'+ query +'/1')
     .end(function(err, res) {
       if(err) {
-        console.log(err);
+        return err;
       } else {
         if (typeof JSON.parse(res.text).data !== 'undefined') {
             if (JSON.parse(res.text).data[0].duration < 600) {
