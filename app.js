@@ -34,7 +34,7 @@ app.post('/phone-receive', function(req, res) {
   search(req.body.Body, function(url) {
     startCall(url);
   });
-  
+
   function startCall(url) {
     if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 --audio-quality 9 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
       var call = phoneClient.calls.create({
@@ -50,12 +50,14 @@ app.post('/phone-receive', function(req, res) {
 
 app.post('/app-receive', function(req, res) {
    search(req.body.Body, function(url) {
-    startCall(url);
+    startTransfer(url);
   });
 
-  function startCall(url) {
+  function startTransfer(url) {
     if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 --audio-quality 9 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
-      
+      fs.readFile('tmp/' + url.substring(url.length - 11) + '.mp3', function(err, data) {
+        var str = data.toString('base64');       
+      });
     }
     return;
   }
