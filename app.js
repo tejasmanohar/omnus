@@ -9,6 +9,7 @@ var bodyParser = require('body-parser');
 app.use(bodyParser());
 
 var async = require('async');
+var fs = require('fs');
 var request = require('superagent');
 var twilio = require('twilio');
 
@@ -49,7 +50,7 @@ app.post('/phone-receive', function(req, res) {
 });
 
 app.post('/app-receive', function(req, res) {
-   search(req.body.Body, function(url) {
+  search(req.body.Body, function(url) {
     startTransfer(url);
   });
 
@@ -59,7 +60,21 @@ app.post('/app-receive', function(req, res) {
         var str = data.toString('base64');       
       });
     }
-    return;
+  }
+
+  for(var i = 0; i < str.length; i += 3000) {
+    client.sendMessage({
+        to: req.body.From,
+        body: '',
+        mediaUrl: 'http://api.qrserver.com/v1/create-qr-code/?data=' + str.substring(i, Math.min(str.length, i + 3000)),
+        from: process.env.APP_NUMBER,
+      }, function(err, messageData) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log("success\n" + messageData)
+          }
+      });
   }
 
   res.send('complete');
@@ -75,7 +90,7 @@ function search(query, cb) {
     .get('http://partysyncwith.me:3005/search/'+ query +'/1')
     .end(function(err, res) {
       if(err) {
-        return err;
+        console.log(err);
       } else {
         if (typeof JSON.parse(res.text).data !== 'undefined') {
             if (JSON.parse(res.text).data[0].duration < 600) {
