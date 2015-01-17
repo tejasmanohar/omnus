@@ -1,0 +1,26 @@
+{
+  "name": "call-stream",
+  "version": "1.0.0",
+  "description": "stream music offline over phone call",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/tejasmanohar/call-stream.git"
+  },
+  "author": "Tejas Manohar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tejasmanohar/call-stream/issues"
+  },
+  "homepage": "https://github.com/tejasmanohar/call-stream",
+  "dependencies": {
+    "async": "^0.9.0",
+    "superagent": "^0.21.0",
+    "express": "^4.11.0",
+    "twilio": "^1.10.0",
+    "body-parser": "^1.10.1"
+  }
+}
