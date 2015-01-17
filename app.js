@@ -31,15 +31,13 @@ app.get('/', function(req, res) {
 });
 
 app.post('/phone-receive', function(req, res) {
-  var searchSong = req.body.Body;
-
-  search(searchSong, function(url) {
+  search(req.body.Body, function(url) {
     startCall(url);
   });
   
   function startCall(url) {
     if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 --audio-quality 9 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
-      var call = client.calls.create({
+      var call = phoneClient.calls.create({
         to: req.body.From,
         from: process.env.PHONE_NUMBER,
         url: baseUrl + '/xml/' + url.substring(url.length - 11)
@@ -52,8 +50,18 @@ app.post('/phone-receive', function(req, res) {
 });
 
 app.post('/app-receive', function(req, res) {
-  // ...
-  res.sendStatus(200);
+   // search(req.body.Body, function(url) {
+  //   startCall(url);
+  // });
+
+  // function startCall(url) {
+  //   if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 --audio-quality 9 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
+
+  //   }
+  //   return;
+  // }
+
+  res.send('complete');
 });
 
 app.post('/xml/:id', function(req, res) {
