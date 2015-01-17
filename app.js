@@ -1,11 +1,13 @@
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
+app.use(express.static(__dirname + '/public'));
+var bodyParser = require('body-parser');
+app.use(bodyParser());
+
 var request = require('superagent');
 var async = require('async');
 var twilio = require('twilio');
-var bodyParser = require('body-parser');
-app.use(bodyParser());
 
 var client = new twilio.RestClient(process.env.AUTH_SID, process.env.AUTH_TOKEN);
 
@@ -22,11 +24,11 @@ app.all('/receive', function(req, res) {
 
   search(searchSong, function(q) {
     console.log(q);
-  })
+  });
   
   
   var call = client.calls.create({
-    to: "+14806488254",
+    to: req.body.From,
     from: process.env.NUMBER,
     url:"http://call-stream-184860.use1.nitrousbox.com/xml/yo.mp3"});
 
@@ -37,7 +39,6 @@ app.all('/receive', function(req, res) {
 
 // USE THIS LATER FOR COMPRESSION
 app.post('/xml/:file', function(req, res) {
-//   console.log(req.param("file"));
   res.set('Content-Type', 'text/xml');
   res.send('<Response><Play>http://com.twilio.music.ambient.s3.amazonaws.com/gurdonark_-_Exurb.mp3</Play><Redirect/></Response>');
 });
