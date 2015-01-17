@@ -62,6 +62,3 @@ function search(query1, cb) {
       }
     })
 }
-
-
-
