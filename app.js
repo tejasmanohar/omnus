@@ -47,7 +47,7 @@ app.post('/incoming', function(req, res) {
   }
 
   function startCall(url) {
-    if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 --audio-quality 9 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
+    if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 --audio-quality 0 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
       var call = client.calls.create({
         to: req.body.From,
         from: process.env.PHONE_NUMBER,
