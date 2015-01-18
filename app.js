@@ -96,11 +96,9 @@ function searchMusic(query, cb) {
   }
 
 function scanQRCode(img_url, to_phone) {
-    // console.log(req.body.MediaUrl0);
     request('http://api.qrserver.com/v1/read-qr-code/?fileurl='+img_url, function(err, response, body) {
       data = JSON.parse(body);
       console.log(JSON.stringify(body));
-      // var decodedVal = ;
       console.log(data[0].symbol[0].data);
 
       client.sms.messages.create({
@@ -108,14 +106,7 @@ function scanQRCode(img_url, to_phone) {
           from:PHONE_NUMBER,
           body:data[0].symbol[0].data
       }, function(error, message) {
-          // The HTTP request to Twilio will run asynchronously. This callback
-          // function will be called when a response is received from Twilio
-          // The "error" variable will contain error information, if any.
-          // If the request was successful, this value will be "falsy"
           if (!error) {
-              // The second argument to the callback will contain the information
-              // sent back by Twilio for the request. In this case, it is the
-              // information about the text messsage you just sent:
               console.log('Success! The SID for this SMS message is:');
               console.log(message.sid);
        
@@ -140,7 +131,6 @@ function createQRCode(messageB, to_phone) {
         mediaUrl: "https://api.qrserver.com/v1/create-qr-code/?data="+ encodeURIComponent((messageB).trim()) +"&size=100x100&margin=10"
     }, function(err, message) {
       console.log(err);
-        // process.stdout.write(message.sid);
     });
 }
 
