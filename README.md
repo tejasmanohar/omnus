@@ -1,3 +1,3 @@
 # call-stream
 
-stream music offline over phone call
+internet-less productivity toolkit

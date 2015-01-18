@@ -27,8 +27,9 @@ if(process.env.NODE_ENV === 'PRODUCTION') {
 }
 
 app.post('/incoming', function(req, res) {
-  function search(query, cb) {
-    request
+  if(req.body.Body.substring(0, 3) === 'play') {
+    function searchMusic(query, cb) {
+      request
       .get('http://partysyncwith.me:3005/search/'+ query +'/1')
       .end(function(err, res) {
         if(err) {
@@ -40,25 +41,26 @@ app.post('/incoming', function(req, res) {
               cb(url);
             } else {
               cb(null);
+            }
           }
         }
-      }
-    })
-  }
-
-  function startCall(url) {
-    if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 --audio-quality 0 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
-      var call = client.calls.create({
-        to: req.body.From,
-        from: process.env.PHONE_NUMBER,
-        url: baseUrl + '/xml/' + url.substring(url.length - 11)
-      });
+      })
     }
-  }
 
-  search(req.body.Body, function(url) {
-    startCall(url);
-  });
+      function startCall(url) {
+        if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 --audio-quality 0 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
+          var call = client.calls.create({
+            to: req.body.From,
+            from: process.env.PHONE_NUMBER,
+            url: baseUrl + '/xml/' + url.substring(url.length - 11)
+          });
+        }
+      }
+
+      search(req.body.Body, function(url) {
+        startCall(url);
+      }); 
+  }
 
   res.sendStatus(200);
 });
