@@ -18,9 +18,6 @@ var twilio = require('twilio');
 var weather = require('weather-js');
 var wit = require('node-wit');
 
-var ACCESS_TOKEN = process.env.WIT_TOKEN;
-
-
 require('shelljs/global');
 
 var client = new twilio.RestClient(process.env.TWILIO_AUTH_SID, process.env.TWILIO_AUTH_TOKEN);
@@ -37,32 +34,24 @@ if(process.env.NODE_ENV === 'PRODUCTION') {
 
 app.post('/incoming', function(req, res) {
   var body = req.body.Body;
+  console.log(body)
   var intent;
 
-    wit.captureTextIntent(ACCESS_TOKEN, body, function (err, res) {
-      console.log("Response from Wit for text input: ");
-      if (err) console.log("Error: ", err);
-      console.log(JSON.stringify(res, null, " "));
-      intent = res.outcomes[0].intent;
-  });
+  var data;
 
+  wit.captureTextIntent(process.env.WIT_TOKEN, body, function (err, res1) {
+    if (err) console.log("Error: ", err);
+    data = res1;
+    intent = res1.outcomes[0].intent;
 
-
-  if(body.substring(0, 4).toLowerCase() === 'play') {
-    var songs = body.substring(4).split(',');
-
-    for (var i =0; i<songs.length; i++) {
-      searchMusic(body.substring(4), function(url) {
-        startCall(url, req.body.From);
-      });
-    }
-
-    
-
+if(intent === 'play') {
+    searchMusic(data.outcomes[0].entities.song_name[0].value, function(url) {
+      startCall(url, req.body.From);
+    });
 
     res.send('success');
-  } else if(body.substring(0, 7).toLowerCase() === 'weather') {
-      weather.find({search: body.substring(8), degreeType: 'F'}, function(err, result) {
+  } else if(intent === 'weather') {
+      weather.find({search: data.outcomes[0].entities.city[0].value, degreeType: 'F'}, function(err, result) {
         if(err) {
           console.log(err);
         } else {
@@ -167,7 +156,20 @@ app.post('/incoming', function(req, res) {
             });
           }
         })
+    } else {
+      client.sms.messages.create({
+        to: req.body.From,
+        from: process.env.PHONE_NUMBER,
+        body: "sorry, i do not understand"
+    }, function(error, message) {
+        if (error) {
+          console.log(error)
+        } else {
+          res.send('complete')
+        }
+      });
     }
+  });
 });
 
 app.post('/xml/:id', function(req, res) {
