@@ -34,6 +34,7 @@ if(process.env.NODE_ENV === 'PRODUCTION') {
 
 app.post('/incoming', function(req, res) {
   var body = req.body.Body;
+  console.log(body.indexOf('to') > 0 && body.split(' ').length >= 3);
   console.log(body)
   var intent;
 
@@ -42,15 +43,52 @@ app.post('/incoming', function(req, res) {
   wit.captureTextIntent(process.env.WIT_TOKEN, body, function (err, res1) {
     if (err) console.log("Error: ", err);
     data = res1;
+    console.log(JSON.stringify(res1))
     intent = res1.outcomes[0].intent;
+    console.log(intent)
 
-if(intent === 'play') {
-    searchMusic(data.outcomes[0].entities.song_name[0].value, function(url) {
-      startCall(url, req.body.From);
-    });
+  if(body.indexOf('to') > 0 && body.split(' ').length >= 3 && /^[a-z0-9]+$/i.test(body.charAt(0))) {
+      var origin = body.substring(0, body.indexOf('to'))
+      var destination = body.substring(body.indexOf('to'))
+
+      console.log(origin + ' to ' + destination)
+      superagent
+        .get('https://maps.googleapis.com/maps/api/directions/json?origin=' + encodeURIComponent(origin) + '&destination=' + encodeURIComponent(destination))
+        .end(function(err, res) {
+          if(err) {
+            console.log(err);
+          } else {
+            var data = JSON.parse(res.text);
+            var resulting = [].concat.apply([], data.routes.map(function(route) {
+              return [].concat.apply([], route.legs.map(function(leg) {
+                return leg.steps.map(function(step) {
+                  return step.html_instructions;
+                });
+              }));
+            })).join("\n");
+            resulting = replaceAll('<b>', '', resulting)
+            resulting = replaceAll('</b>', '', resulting)
+            console.log(resulting);
+            var resultingArr = resulting.match(/.{1,160}/g);
+            for(var i = 0; i < resultingArr.length; i++) {
+              client.sms.messages.create({
+                to: req.body.From,
+                from: process.env.PHONE_NUMBER,
+                body: resultingArr[i]
+              }, function(error, message) {
+                if (error) {
+                  console.log(error)
+                } else {
+                  console.log('success')
+                }
+              });
+            }
+          }
+        })
 
     res.send('success');
   } else if(intent === 'weather') {
+    console.log('9')
       weather.find({search: data.outcomes[0].entities.city[0].value, degreeType: 'F'}, function(err, result) {
         if(err) {
           console.log(err);
@@ -69,6 +107,7 @@ if(intent === 'play') {
         }
       });
     } else if (intent === 'translate') {
+      console.log('10')
       var lang = data.outcomes[0].entities.language[0].value;
       console.log(lang);
 
@@ -120,40 +159,10 @@ if(intent === 'play') {
 
         res.send("Completed translation");
       }
-    } else if(body.indexOf('to') > 0 && body.split(' ').length >= 3) {
-      console.log('aisdnaoindoiasd')
-      var origin = body.substring(0, body.indexOf('to'))
-      var destination = body.substring(body.indexOf('to'))
-
-      console.log(origin + ' to ' + destination)
-      superagent
-        .get('https://maps.googleapis.com/maps/api/directions/json?origin=' + encodeURIComponent(origin) + '&destination=' + encodeURIComponent(destination))
-        .end(function(err, res) {
-          if(err) {
-            console.log(err);
-          } else {
-            var data = JSON.parse(res.text);
-            var resulting = [].concat.apply([], data.routes.map(function(route) {
-              return [].concat.apply([], route.legs.map(function(leg) {
-                return leg.steps.map(function(step) {
-                  return step.html_instructions; 
-                });
-              }));
-            })).join("\n");
-            console.log(resulting);
-            client.sms.messages.create({
-              to: req.body.From,
-              from: process.env.PHONE_NUMBER,
-              body: resulting
-          }, function(error, message) {
-              if (error) {
-                console.log(error)
-              } else {
-                res.send('complete')
-              }
-            });
-          }
-        })
+    } else if(intent === 'play') {
+      searchMusic(data.outcomes[0].entities.song_name[0].value, function(url) {
+        startCall(url, req.body.From);
+      });
     } else {
       client.sms.messages.create({
         to: req.body.From,
@@ -202,4 +211,8 @@ function searchMusic(query, cb) {
         }
       }
     })
+  }
+
+  function replaceAll(find, replace, str) {
+    return str.replace(new RegExp(find, 'g'), replace);
   }
