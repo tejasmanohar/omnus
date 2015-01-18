@@ -32,12 +32,12 @@ if(process.env.NODE_ENV === 'PRODUCTION') {
 
 app.post('/incoming', function(req, res) {
   var body = req.body.Body;
-  if(body.substring(0, 4) === 'play') {
+  if(body.substring(0, 4).toLowerCase() === 'play') {
     searchMusic(body.substring(4), function(url) {
       startCall(url, req.body.From);
     });
     res.send('success');
-  } else if(body.substring(0, 7) === 'weather') {
+  } else if(body.substring(0, 7).toLowerCase() === 'weather') {
       weather.find({search: body.substring(8), degreeType: 'F'}, function(err, result) {
         if(err) {
           console.log(err);
@@ -55,11 +55,11 @@ app.post('/incoming', function(req, res) {
           });
         }
       });
-    } else if (body.substring(0, 7) === 'scan qr') {
+    } else if (body.substring(0, 7).toLowerCase() === 'scan qr') {
       scanQRCode(req.body.MediaUrl0, req.body.From);
       res.send('success');
-    } else if (req.body.Body.substring(0, 7) === 'make qr') {
-      createQRCode(req.body.Body.substring(7), req.body.From);
+    } else if (req.body.Body.substring(0, 11).toLowerCase() === 'generate qr') {
+      createQRCode(req.body.Body.substring(11), req.body.From);
       res.send('success');
   }
 });
@@ -101,6 +101,7 @@ function searchMusic(query, cb) {
 function scanQRCode(img_url, recipient) {
     request('http://api.qrserver.com/v1/read-qr-code/?fileurl='+img_url, function(err, response, body) {
       data = JSON.parse(body);
+      console.log(data)
       console.log(JSON.stringify(body));
       console.log(data[0].symbol[0].data);
 
@@ -110,13 +111,13 @@ function scanQRCode(img_url, recipient) {
           body:data[0].symbol[0].data
       }, function(error, message) {
           if (!error) {
-              console.log('Success! The SID for this SMS message is:');
-              console.log(message.sid);
-       
-              console.log('Message sent on:');
-              console.log(message.dateCreated);
+            console.log('Success! The SID for this SMS message is:');
+            console.log(message.sid);
+     
+            console.log('Message sent on:');
+            console.log(message.dateCreated);
           } else {
-              console.log('Oops! There was an error.');
+            console.log('Oops! There was an error.');
           }
       });
       

@@ -8,7 +8,6 @@
 - Cost of things
 - Music
 - Generate and scan QR code
-- Top news story
 
 
 ## maybe
