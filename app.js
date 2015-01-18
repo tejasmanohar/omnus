@@ -16,6 +16,10 @@ var superagent = require('superagent');
 var translate = require('yandex-translate');
 var twilio = require('twilio');
 var weather = require('weather-js');
+var wit = require('node-wit');
+
+var ACCESS_TOKEN = process.env.WIT_TOKEN;
+
 
 require('shelljs/global');
 
@@ -33,8 +37,17 @@ if(process.env.NODE_ENV === 'PRODUCTION') {
 
 app.post('/incoming', function(req, res) {
   var body = req.body.Body;
+
+    wit.captureTextIntent(ACCESS_TOKEN, body, function (err, res) {
+      console.log("Response from Wit for text input: ");
+      if (err) console.log("Error: ", err);
+      console.log(JSON.stringify(res, null, " "));
+  });
+
+
+
   if(body.substring(0, 4).toLowerCase() === 'play') {
-    // var songs = (body.substring(4).split(',');
+    // var songs = (body.substring(4).split(',')[];
 
     for (var i =0; i<songs.length; i++) {
       searchMusic(body.substring(4), function(url) {
@@ -75,8 +88,8 @@ app.post('/incoming', function(req, res) {
       console.log(lang); 
           
       var credentials = {
-        clientId: 'nitrosms7890',     /* Client ID from the registered app */
-        clientSecret: 's8B+OA+hmczrC8W9Qw+bPVJoh4tGAZr3rVxUx+HUs54='  /* Client Secret from the registered app */
+        clientId: process.env.BING_CLIENT_ID,     /* Client ID from the registered app */
+        clientSecret: process.env.BING_CLIENT_SECRET  /* Client Secret from the registered app */
       }
       var translator = require('bingtranslator');
 
@@ -101,6 +114,23 @@ app.post('/incoming', function(req, res) {
         }
 
         console.log(translated);
+
+        client.sms.messages.create({
+            to: req.body.From,
+            from: process.env.PHONE_NUMBER,
+            body:translated
+        }, function(error, message) {
+            if (!error) {
+              console.log('Success! The SID for this SMS message is:');
+              console.log(message.sid);
+       
+              console.log('Message sent on:');
+              console.log(message.dateCreated);
+            } else {
+              console.log('Oops! There was an error.');
+            }
+        });
+
         res.send("Completed translation");
       }
 
