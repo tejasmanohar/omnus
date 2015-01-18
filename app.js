@@ -6,7 +6,7 @@ var app = express();
 var server = require('http').createServer(app);
 app.use(express.static(__dirname + '/tmp'));
 var bodyParser = require('body-parser');
-app.use(bodyParser());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 var fs = require('fs');
 var request = require('superagent');
@@ -26,7 +26,7 @@ if(process.env.NODE_ENV === 'PRODUCTION') {
   var baseUrl = 'http://46cfc4a8.ngrok.com';
 }
 
-app.post('/receive', function(req, res) {
+app.post('/incoming', function(req, res) {
   function search(query, cb) {
     request
       .get('http://partysyncwith.me:3005/search/'+ query +'/1')
