@@ -30,42 +30,14 @@ if(process.env.NODE_ENV === 'PRODUCTION') {
 
 app.post('/incoming', function(req, res) {
   var body = req.body.Body;
-  if(body.substring(0, 4) === 'play ') {
-    function searchMusic(query, cb) {
-      superagent
-        .get('http://partysyncwith.me:3005/search/'+ query +'/1')
-        .end(function(err, res) {
-          if(err) {
-            console.log(err);
-          } else {
-            if (typeof JSON.parse(res.text).data !== 'undefined') {
-              if (JSON.parse(res.text).data[0].duration < 600) {
-                var url = JSON.parse(res.text).data[0].video_url;
-                cb(url);
-              } else {
-                cb(null);
-              }
-            }
-          }
-        })
-      }
-
-      function startCall(url) {
-        if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 --audio-quality 0 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
-          var call = client.calls.create({
-            to: req.body.From,
-            from: process.env.PHONE_NUMBER,
-            url: baseUrl + '/xml/' + url.substring(url.length - 11)
-          });
-        }
-      }
-
-      search(body, function(url) {
+  console.log(body)
+  if(body.substring(0, 3) === 'play') {
+      search(body.substring(4), function(url) {
         startCall(url);
       });
 
       res.send('success');
-  } else if(body.substring(0, 7) === 'weather ') {
+  } else if(body.substring(0, 6) === 'weather') {
     weather({location: body.substring(8)}, function(data) {
       client.sendMessage({
         to: req.query.From,
@@ -83,7 +55,7 @@ app.post('/incoming', function(req, res) {
     scanQRCode(req.body.MediaUrl0, req.body.From);
     res.send('success');
   } else if (req.body.Body.substring(0, 6) === 'make qr') {
-    createQRCode(req.body.Body.substring(4), req.body.From);
+    createQRCode(req.body.Body.substring(7), req.body.From);
     res.send('success');
   }
 
@@ -94,7 +66,34 @@ app.post('/xml/:id', function(req, res) {
   res.send('<Response><Play>' + baseUrl + '/' + req.params.id + '.mp3' + '</Play><Redirect/></Response>');
 });
 
+function startCall(url) {
+  if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 --audio-quality 0 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
+    var call = client.calls.create({
+      to: req.body.From,
+      from: process.env.PHONE_NUMBER,
+      url: baseUrl + '/xml/' + url.substring(url.length - 11)
+    });
+  }
+}
 
+function searchMusic(query, cb) {
+  superagent
+    .get('http://partysyncwith.me:3005/search/'+ query +'/1')
+    .end(function(err, res) {
+      if(err) {
+        console.log(err);
+      } else {
+        if (typeof JSON.parse(res.text).data !== 'undefined') {
+          if (JSON.parse(res.text).data[0].duration < 600) {
+            var url = JSON.parse(res.text).data[0].video_url;
+            cb(url);
+          } else {
+            cb(null);
+          }
+        }
+      }
+    })
+  }
 
 function scanQRCode(img_url, to_phone) {
     // console.log(req.body.MediaUrl0);
