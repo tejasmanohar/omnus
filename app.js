@@ -6,13 +6,15 @@ var app = express();
 var server = require('http').createServer(app);
 app.use(express.static(__dirname + '/tmp'));
 var bodyParser = require('body-parser');
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({
+  extended: true
+}));
 
 var fs = require('fs');
 var request = require('request');
 var superagent = require('superagent');
 var twilio = require('twilio');
-var weather = require('weather');
+var weather = require('weather-js');
 
 require('shelljs/global');
 
@@ -31,30 +33,34 @@ if(process.env.NODE_ENV === 'PRODUCTION') {
 app.post('/incoming', function(req, res) {
   var body = req.body.Body;
   if(body.substring(0, 4) === 'play') {
-      search(body.substring(4), function(url) {
-        startCall(url);
-      });
-      res.send('success');
+    searchMusic(body.substring(4), function(url) {
+      startCall(url, req.body.From);
+    });
+    res.send('success');
   } else if(body.substring(0, 7) === 'weather') {
-    weather({location: body.substring(8)}, function(data) {
-      client.sendMessage({
-        to: req.query.From,
-        from: process.env.PHONE_NUMBER,
-        body: data.temp
-      }, function(err, responseData) {
-        if (err) {
-          res.send('success');
+      weather.find({search: body.substring(8), degreeType: 'F'}, function(err, result) {
+        if(err) {
+          console.log(err);
         } else {
-          res.send('failure');
+          client.sms.messages.create({
+              to: req.body.From,
+              from: process.env.PHONE_NUMBER,
+              body: result[0].current.temperature + '° Fahrenheit'
+          }, function(error, message) {
+              if (error) {
+                console.log(error);
+              } else {
+                console.log(message)
+              }
+          });
         }
       });
-    });
-  } else if (body.substring(0, 7) === 'scan qr') {
-    scanQRCode(req.body.MediaUrl0, req.body.From);
-    res.send('success');
-  } else if (req.body.Body.substring(0, 7) === 'make qr') {
-    createQRCode(req.body.Body.substring(7), req.body.From);
-    res.send('success');
+    } else if (body.substring(0, 7) === 'scan qr') {
+      scanQRCode(req.body.MediaUrl0, req.body.From);
+      res.send('success');
+    } else if (req.body.Body.substring(0, 7) === 'make qr') {
+      createQRCode(req.body.Body.substring(7), req.body.From);
+      res.send('success');
   }
 });
 
@@ -63,10 +69,10 @@ app.post('/xml/:id', function(req, res) {
   res.send('<Response><Play>' + baseUrl + '/' + req.params.id + '.mp3' + '</Play><Redirect/></Response>');
 });
 
-function startCall(url) {
+function startCall(url, recipient) {
   if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 --audio-quality 0 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
     var call = client.calls.create({
-      to: req.body.From,
+      to: recipient,
       from: process.env.PHONE_NUMBER,
       url: baseUrl + '/xml/' + url.substring(url.length - 11)
     });
@@ -92,15 +98,15 @@ function searchMusic(query, cb) {
     })
   }
 
-function scanQRCode(img_url, to_phone) {
+function scanQRCode(img_url, recipient) {
     request('http://api.qrserver.com/v1/read-qr-code/?fileurl='+img_url, function(err, response, body) {
       data = JSON.parse(body);
       console.log(JSON.stringify(body));
       console.log(data[0].symbol[0].data);
 
       client.sms.messages.create({
-          to:to_phone,
-          from:PHONE_NUMBER,
+          to: recipient,
+          from: process.env.PHONE_NUMBER,
           body:data[0].symbol[0].data
       }, function(error, message) {
           if (!error) {
@@ -119,12 +125,12 @@ function scanQRCode(img_url, to_phone) {
 
 
 
-function createQRCode(messageB, to_phone) {
+function createQRCode(messageB, recipient) {
  
     client.messages.create({
-        body: "",
-        to: to_phone,
-        from: PHONE_NUMBER,
+        body: '',
+        to: recipient,
+        from: process.env.PHONE_NUMBER,
         mediaUrl: "https://api.qrserver.com/v1/create-qr-code/?data="+ encodeURIComponent((messageB).trim()) +"&size=100x100&margin=10"
     }, function(err, message) {
       console.log(err);
