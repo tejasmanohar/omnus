@@ -59,10 +59,10 @@ app.post('/incoming', function(req, res) {
 
       search(req.body.Body, function(url) {
         startCall(url);
-      }); 
-  }
+      });
 
-  res.sendStatus(200);
+      res.sendStatus(200);
+  }
 });
 
 app.post('/xml/:id', function(req, res) {
