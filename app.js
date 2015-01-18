@@ -26,10 +26,6 @@ if(process.env.NODE_ENV === 'PRODUCTION') {
   var baseUrl = 'http://46cfc4a8.ngrok.com';
 }
 
-app.get('/', function(req, res) {
-  res.sendStatus(200);
-});
-
 app.post('/receive', function(req, res) {
   function search(query, cb) {
     request
