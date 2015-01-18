@@ -11,6 +11,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 var fs = require('fs');
+var randomWord = require('random-word');
 var request = require('request');
 var superagent = require('superagent');
 var translate = require('yandex-translate');
@@ -161,6 +162,18 @@ app.post('/incoming', function(req, res) {
       searchMusic(data.outcomes[0].entities.song_name[0].value, function(url) {
         startCall(url, req.body.From);
       });
+    } else if(body.toLowerCase() === 'random') {
+      client.sms.messages.create({
+      to: req.body.From,
+      from: process.env.PHONE_NUMBER,
+      body: randomWord()
+      }, function(error, message) {
+          if (error) {
+            console.log(error)
+          } else {
+            res.send('complete')
+          }
+    });
     } else {
       client.sms.messages.create({
         to: req.body.From,
