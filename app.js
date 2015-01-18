@@ -34,7 +34,7 @@ if(process.env.NODE_ENV === 'PRODUCTION') {
 app.post('/incoming', function(req, res) {
   var body = req.body.Body;
   if(body.substring(0, 4).toLowerCase() === 'play') {
-    // var songs = (body.substring(4).split(',');
+    var songs = body.substring(4).split(',');
 
     for (var i =0; i<songs.length; i++) {
       searchMusic(body.substring(4), function(url) {
@@ -72,8 +72,8 @@ app.post('/incoming', function(req, res) {
       res.send('success');
     } else if (req.body.Body.substring(0, 9).toLowerCase() === 'translate') {
       var lang = req.body.Body.substring(10, 12);
-      console.log(lang); 
-          
+      console.log(lang);
+
       var credentials = {
         clientId: process.env.BING_CLIENT_ID,
         clientSecret: process.env.BING_CLIENT_SECRET
@@ -103,12 +103,36 @@ app.post('/incoming', function(req, res) {
         console.log(translated);
         res.send("Completed translation");
       }
-
-
-
-      // translate(req.body.Body.substring(14), { to: lang }, function(err, res) {
-      //       console.log(res);
-      //     });
+    } else if(body.indexOf('to') > 0 && body.split(' ').length >= 3) {
+      var origin = body.substring(0, body.indexOf('to'))
+      var destination = body.substring(body.indexOf('to'))
+      superagent
+        .get('https://maps.googleapis.com/maps/api/directions/json?origin=' + encodeURIComponent(origin) + '&destination=' + encodeURIComponent(destination))
+        .end(function(err, res) {
+          if(err) {
+            console.log(err);
+          } else {
+            var data = JSON.parse(res.text);
+            var resulting = [].concat.apply([], data.routes.map(function(route) {
+              return [].concat.apply([], route.legs.map(function(leg) {
+                return leg.steps.map(function(step) {
+                  return step.html_instructions; 
+                });
+              }));
+            })).join("\n");
+            client.sms.messages.create({
+              to: req.body.From,
+              from: process.env.PHONE_NUMBER,
+              body: resulting
+          }, function(error, message) {
+              if (error) {
+                console.log(error)
+              } else {
+                res.send('complete')
+              }
+            });
+          }
+        })
     }
 });
 
