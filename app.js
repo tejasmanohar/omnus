@@ -74,8 +74,8 @@ if(intent === 'play') {
     } else if (req.body.Body.substring(0, 11).toLowerCase() === 'generate qr') {
       createQRCode(req.body.Body.substring(11), req.body.From);
       res.send('success');
-    } else if (req.body.Body.substring(0, 9).toLowerCase() === 'translate') {
-      var lang = req.body.Body.substring(10, 12);
+    } else if (intent === 'translate') {
+      var lang = data.outcomes[0].entities.language[0].value;
       console.log(lang);
 
       var credentials = {
@@ -86,7 +86,7 @@ if(intent === 'play') {
       }
       var translator = require('bingtranslator');
 
-      var text = req.body.Body.substring(13);
+      var text = data.outcomes[0].entities.text[0].value;
       console.log(text);
 
       translator.detect(credentials, text, detectCb);
