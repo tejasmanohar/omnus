@@ -9,6 +9,7 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 
 var fs = require('fs');
+var request = require('request');
 var superagent = require('superagent');
 var twilio = require('twilio');
 var weather = require('weather');
@@ -63,7 +64,7 @@ app.post('/incoming', function(req, res) {
         startCall(url);
       });
 
-      res.send('complete');
+      res.send('success');
   } else if(body.substring(0, 7) === 'weather ') {
     weather({location: body.substring(8)}, function(data) {
       client.sendMessage({
@@ -72,16 +73,76 @@ app.post('/incoming', function(req, res) {
         body: data.temp
       }, function(err, responseData) {
         if (err) {
-          res.sendStatus(500);
+          res.send('success');
         } else {
-          res.send('complete');
+          res.send('failure');
         }
       });
     });
+  } else if (body.substring(0, 6) === 'scan qr') {
+    scanQRCode(req.body.MediaUrl0, req.body.From);
+    res.send('success');
+  } else if (req.body.Body.substring(0, 6) === 'make qr') {
+    createQRCode(req.body.Body.substring(4), req.body.From);
+    res.send('success');
   }
+
 });
 
 app.post('/xml/:id', function(req, res) {
   res.set('Content-Type', 'text/xml');
   res.send('<Response><Play>' + baseUrl + '/' + req.params.id + '.mp3' + '</Play><Redirect/></Response>');
 });
+
+
+
+function scanQRCode(img_url, to_phone) {
+    // console.log(req.body.MediaUrl0);
+    request('http://api.qrserver.com/v1/read-qr-code/?fileurl='+img_url, function(err, response, body) {
+      data = JSON.parse(body);
+      console.log(JSON.stringify(body));
+      // var decodedVal = ;
+      console.log(data[0].symbol[0].data);
+
+      client.sms.messages.create({
+          to:to_phone,
+          from:PHONE_NUMBER,
+          body:data[0].symbol[0].data
+      }, function(error, message) {
+          // The HTTP request to Twilio will run asynchronously. This callback
+          // function will be called when a response is received from Twilio
+          // The "error" variable will contain error information, if any.
+          // If the request was successful, this value will be "falsy"
+          if (!error) {
+              // The second argument to the callback will contain the information
+              // sent back by Twilio for the request. In this case, it is the
+              // information about the text messsage you just sent:
+              console.log('Success! The SID for this SMS message is:');
+              console.log(message.sid);
+       
+              console.log('Message sent on:');
+              console.log(message.dateCreated);
+          } else {
+              console.log('Oops! There was an error.');
+          }
+      });
+      
+    });
+}
+
+
+
+function createQRCode(messageB, to_phone) {
+ 
+    client.messages.create({
+        body: "",
+        to: to_phone,
+        from: PHONE_NUMBER,
+        mediaUrl: "https://api.qrserver.com/v1/create-qr-code/?data="+ encodeURIComponent((messageB).trim()) +"&size=100x100&margin=10"
+    }, function(err, message) {
+      console.log(err);
+        // process.stdout.write(message.sid);
+    });
+}
+
+
