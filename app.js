@@ -9,7 +9,7 @@ var bodyParser = require('body-parser');
 app.use(bodyParser.urlencoded({ extended: true }));
 
 var fs = require('fs');
-var request = require('superagent');
+var superagent = require('superagent');
 var twilio = require('twilio');
 
 require('shelljs/global');
@@ -29,23 +29,23 @@ if(process.env.NODE_ENV === 'PRODUCTION') {
 app.post('/incoming', function(req, res) {
   if(req.body.Body.substring(0, 3) === 'play') {
     function searchMusic(query, cb) {
-      request
-      .get('http://partysyncwith.me:3005/search/'+ query +'/1')
-      .end(function(err, res) {
-        if(err) {
-          console.log(err);
-        } else {
-          if (typeof JSON.parse(res.text).data !== 'undefined') {
-            if (JSON.parse(res.text).data[0].duration < 600) {
-              var url = JSON.parse(res.text).data[0].video_url;
-              cb(url);
-            } else {
-              cb(null);
+      superagent
+        .get('http://partysyncwith.me:3005/search/'+ query +'/1')
+        .end(function(err, res) {
+          if(err) {
+            console.log(err);
+          } else {
+            if (typeof JSON.parse(res.text).data !== 'undefined') {
+              if (JSON.parse(res.text).data[0].duration < 600) {
+                var url = JSON.parse(res.text).data[0].video_url;
+                cb(url);
+              } else {
+                cb(null);
+              }
             }
           }
-        }
-      })
-    }
+        })
+      }
 
       function startCall(url) {
         if (exec('youtube-dl --extract-audio --prefer-ffmpeg --audio-format mp3 --audio-quality 0 -o "tmp/%(id)s.%(ext)s" ' + url).code === 0) {
