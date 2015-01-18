@@ -71,6 +71,7 @@ app.post('/app-receive', function(req, res) {
                   console.log(messageData.status);
                 }
             });
+            // exec('sleep 1000');
         }
       });
     }
