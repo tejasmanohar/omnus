@@ -26,12 +26,6 @@ var port = process.env.PORT || 3000;
 server.listen(port);
 console.log('Listening at port: ' + port);
 
-if(process.env.NODE_ENV === 'PRODUCTION') {
-  var baseUrl = 'domain.com';
-} else {
-  var baseUrl = 'http://46cfc4a8.ngrok.com';
-}
-
 app.post('/incoming', function(req, res) {
   var body = req.body.Body;
   console.log(body.indexOf('to') > 0 && body.split(' ').length >= 3);
@@ -181,7 +175,7 @@ app.post('/incoming', function(req, res) {
 
 app.post('/xml/:id', function(req, res) {
   res.set('Content-Type', 'text/xml');
-  res.send('<Response><Play>' + baseUrl + '/' + req.params.id + '.mp3' + '</Play><Redirect/></Response>');
+  res.send('<Response><Play>' + process.env.BASE_URL + '/' + req.params.id + '.mp3' + '</Play><Redirect/></Response>');
 });
 
 function startCall(url, recipient) {
@@ -189,7 +183,7 @@ function startCall(url, recipient) {
     var call = client.calls.create({
       to: recipient,
       from: process.env.PHONE_NUMBER,
-      url: baseUrl + '/xml/' + url.substring(url.length - 11)
+      url: process.env.BASE_URL + '/xml/' + url.substring(url.length - 11)
     });
   }
 }
