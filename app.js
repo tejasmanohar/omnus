@@ -37,17 +37,19 @@ if(process.env.NODE_ENV === 'PRODUCTION') {
 
 app.post('/incoming', function(req, res) {
   var body = req.body.Body;
+  var intent;
 
     wit.captureTextIntent(ACCESS_TOKEN, body, function (err, res) {
       console.log("Response from Wit for text input: ");
       if (err) console.log("Error: ", err);
       console.log(JSON.stringify(res, null, " "));
+      intent = res.outcomes[0].intent;
   });
 
 
 
   if(body.substring(0, 4).toLowerCase() === 'play') {
-    // var songs = (body.substring(4).split(',')[];
+    var songs = body.substring(4).split(',');
 
     for (var i =0; i<songs.length; i++) {
       searchMusic(body.substring(4), function(url) {
@@ -88,8 +90,10 @@ app.post('/incoming', function(req, res) {
       console.log(lang); 
           
       var credentials = {
+
         clientId: process.env.BING_CLIENT_ID,     /* Client ID from the registered app */
         clientSecret: process.env.BING_CLIENT_SECRET  /* Client Secret from the registered app */
+
       }
       var translator = require('bingtranslator');
 
