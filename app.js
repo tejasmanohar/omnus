@@ -62,6 +62,10 @@ app.post('/incoming', function(req, res) {
             })).join("\n");
             resulting = replaceAll('<b>', '', resulting)
             resulting = replaceAll('</b>', '', resulting)
+            resulting = replaceAll('<span>', '', resulting)
+            resulting = replaceAll('</span>', '', resulting)
+            resulting = replaceAll('<div>', '', resulting)
+            resulting = replaceAll('</div>', '', resulting)
             console.log(resulting);
             var resultingArr = resulting.match(/.{1,160}/g);
             for(var i = 0; i < resultingArr.length; i++) {
