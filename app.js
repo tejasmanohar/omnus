@@ -30,14 +30,12 @@ if(process.env.NODE_ENV === 'PRODUCTION') {
 
 app.post('/incoming', function(req, res) {
   var body = req.body.Body;
-  console.log(body)
-  if(body.substring(0, 3) === 'play') {
+  if(body.substring(0, 4) === 'play') {
       search(body.substring(4), function(url) {
         startCall(url);
       });
-
       res.send('success');
-  } else if(body.substring(0, 6) === 'weather') {
+  } else if(body.substring(0, 7) === 'weather') {
     weather({location: body.substring(8)}, function(data) {
       client.sendMessage({
         to: req.query.From,
@@ -51,14 +49,13 @@ app.post('/incoming', function(req, res) {
         }
       });
     });
-  } else if (body.substring(0, 6) === 'scan qr') {
+  } else if (body.substring(0, 7) === 'scan qr') {
     scanQRCode(req.body.MediaUrl0, req.body.From);
     res.send('success');
-  } else if (req.body.Body.substring(0, 6) === 'make qr') {
+  } else if (req.body.Body.substring(0, 7) === 'make qr') {
     createQRCode(req.body.Body.substring(7), req.body.From);
     res.send('success');
   }
-
 });
 
 app.post('/xml/:id', function(req, res) {
