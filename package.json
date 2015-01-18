@@ -19,6 +19,7 @@
     "express": "^4.11.0",
     "shelljs": "^0.3.0",
     "superagent": "^0.21.0",
-    "twilio": "^1.10.0"
+    "twilio": "^1.10.0",
+    "weather": "^0.1.0"
   }
 }

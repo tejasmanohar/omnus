@@ -11,6 +11,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 var fs = require('fs');
 var superagent = require('superagent');
 var twilio = require('twilio');
+var weather = require('weather');
 
 require('shelljs/global');
 
@@ -27,7 +28,8 @@ if(process.env.NODE_ENV === 'PRODUCTION') {
 }
 
 app.post('/incoming', function(req, res) {
-  if(req.body.Body.substring(0, 3) === 'play') {
+  var body = req.body.Body;
+  if(body.substring(0, 4) === 'play ') {
     function searchMusic(query, cb) {
       superagent
         .get('http://partysyncwith.me:3005/search/'+ query +'/1')
@@ -57,11 +59,25 @@ app.post('/incoming', function(req, res) {
         }
       }
 
-      search(req.body.Body, function(url) {
+      search(body, function(url) {
         startCall(url);
       });
 
-      res.sendStatus(200);
+      res.send('complete');
+  } else if(body.substring(0, 7) === 'weather ') {
+    weather({location: body.substring(8)}, function(data) {
+      client.sendMessage({
+        to: req.query.From,
+        from: process.env.PHONE_NUMBER,
+        body: data.temp
+      }, function(err, responseData) {
+        if (err) {
+          res.sendStatus(500);
+        } else {
+          res.send('complete');
+        }
+      });
+    });
   }
 });
 
