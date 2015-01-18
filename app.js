@@ -75,8 +75,8 @@ app.post('/incoming', function(req, res) {
       console.log(lang); 
           
       var credentials = {
-        clientId: 'nitrosms7890',     /* Client ID from the registered app */
-        clientSecret: 's8B+OA+hmczrC8W9Qw+bPVJoh4tGAZr3rVxUx+HUs54='  /* Client Secret from the registered app */
+        clientId: process.env.BING_CLIENT_ID,
+        clientSecret: process.env.BING_CLIENT_SECRET
       }
       var translator = require('bingtranslator');
 
