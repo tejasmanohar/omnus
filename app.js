@@ -68,12 +68,6 @@ if(intent === 'play') {
           });
         }
       });
-    } else if (body.substring(0, 7).toLowerCase() === 'scan qr') {
-      scanQRCode(req.body.MediaUrl0, req.body.From);
-      res.send('success');
-    } else if (req.body.Body.substring(0, 11).toLowerCase() === 'generate qr') {
-      createQRCode(req.body.Body.substring(11), req.body.From);
-      res.send('success');
     } else if (intent === 'translate') {
       var lang = data.outcomes[0].entities.language[0].value;
       console.log(lang);
@@ -127,8 +121,11 @@ if(intent === 'play') {
         res.send("Completed translation");
       }
     } else if(body.indexOf('to') > 0 && body.split(' ').length >= 3) {
+      console.log('aisdnaoindoiasd')
       var origin = body.substring(0, body.indexOf('to'))
       var destination = body.substring(body.indexOf('to'))
+
+      console.log(origin + ' to ' + destination)
       superagent
         .get('https://maps.googleapis.com/maps/api/directions/json?origin=' + encodeURIComponent(origin) + '&destination=' + encodeURIComponent(destination))
         .end(function(err, res) {
@@ -143,6 +140,7 @@ if(intent === 'play') {
                 });
               }));
             })).join("\n");
+            console.log(resulting);
             client.sms.messages.create({
               to: req.body.From,
               from: process.env.PHONE_NUMBER,
@@ -205,46 +203,3 @@ function searchMusic(query, cb) {
       }
     })
   }
-
-function scanQRCode(img_url, recipient) {
-    request('http://api.qrserver.com/v1/read-qr-code/?fileurl='+img_url, function(err, response, body) {
-      data = JSON.parse(body);
-      console.log(data)
-      console.log(JSON.stringify(body));
-      console.log(data[0].symbol[0].data);
-
-      client.sms.messages.create({
-          to: recipient,
-          from: process.env.PHONE_NUMBER,
-          body:data[0].symbol[0].data
-      }, function(error, message) {
-          if (!error) {
-            console.log('Success! The SID for this SMS message is:');
-            console.log(message.sid);
-     
-            console.log('Message sent on:');
-            console.log(message.dateCreated);
-          } else {
-            console.log('Oops! There was an error.');
-          }
-      });
-      
-    });
-}
-
-
-
-
-function createQRCode(messageB, recipient) {
- 
-    client.messages.create({
-        body: '',
-        to: recipient,
-        from: process.env.PHONE_NUMBER,
-        mediaUrl: "https://api.qrserver.com/v1/create-qr-code/?data="+ encodeURIComponent((messageB).trim()) +"&size=100x100&margin=10"
-    }, function(err, message) {
-      console.log(err);
-    });
-}
-
-
