@@ -13,6 +13,7 @@ app.use(bodyParser.urlencoded({
 var fs = require('fs');
 var request = require('request');
 var superagent = require('superagent');
+var translate = require('yandex-translate');
 var twilio = require('twilio');
 var weather = require('weather-js');
 
@@ -33,9 +34,17 @@ if(process.env.NODE_ENV === 'PRODUCTION') {
 app.post('/incoming', function(req, res) {
   var body = req.body.Body;
   if(body.substring(0, 4).toLowerCase() === 'play') {
-    searchMusic(body.substring(4), function(url) {
-      startCall(url, req.body.From);
-    });
+    // var songs = (body.substring(4).split(',');
+
+    for (var i =0; i<songs.length; i++) {
+      searchMusic(body.substring(4), function(url) {
+        startCall(url, req.body.From);
+      });
+    }
+
+    
+
+
     res.send('success');
   } else if(body.substring(0, 7).toLowerCase() === 'weather') {
       weather.find({search: body.substring(8), degreeType: 'F'}, function(err, result) {
@@ -61,7 +70,46 @@ app.post('/incoming', function(req, res) {
     } else if (req.body.Body.substring(0, 11).toLowerCase() === 'generate qr') {
       createQRCode(req.body.Body.substring(11), req.body.From);
       res.send('success');
-  }
+    } else if (req.body.Body.substring(0, 9).toLowerCase() === 'translate') {
+      var lang = req.body.Body.substring(10, 12);
+      console.log(lang); 
+          
+      var credentials = {
+        clientId: 'nitrosms7890',     /* Client ID from the registered app */
+        clientSecret: 's8B+OA+hmczrC8W9Qw+bPVJoh4tGAZr3rVxUx+HUs54='  /* Client Secret from the registered app */
+      }
+      var translator = require('bingtranslator');
+
+      var text = req.body.Body.substring(13);
+      console.log(text);
+
+      translator.detect(credentials, text, detectCb);
+
+      function detectCb(err, from) {
+        if (err) {
+          console.log('error', err);
+          return;
+        }
+
+        translator.translate(credentials, text, from, lang, translateCb);
+      }
+
+      function translateCb(err, translated) {
+        if (err) {
+          console.log('error', err);
+          return;
+        }
+
+        console.log(translated);
+        res.send("Completed translation");
+      }
+
+
+
+      // translate(req.body.Body.substring(14), { to: lang }, function(err, res) {
+      //       console.log(res);
+      //     });
+    }
 });
 
 app.post('/xml/:id', function(req, res) {
@@ -123,6 +171,7 @@ function scanQRCode(img_url, recipient) {
       
     });
 }
+
 
 
 
