@@ -20,7 +20,7 @@ var weather = require('weather-js');
 var wit = require('node-wit');
 
 require('shelljs/global');
-
+var parseString = require('xml2js').parseString;
 var client = new twilio.RestClient(process.env.TWILIO_AUTH_SID, process.env.TWILIO_AUTH_TOKEN);
 
 var port = process.env.PORT || 3000;
@@ -41,8 +41,34 @@ app.post('/incoming', function(req, res) {
     console.log(JSON.stringify(res1))
     intent = res1.outcomes[0].intent;
     console.log(intent)
-
-  if(body.indexOf('to') > 0 && body.split(' ').length >= 3 && /^[a-z0-9]+$/i.test(body.charAt(0))) {
+    
+    if(body.substring(0,6).toLowerCase() === 'define') {
+        superagent
+          .get('http://www.dictionaryapi.com/api/v1/references/collegiate/xml/' + body.substring(7) + '?key=' + process.env.KEY_DICTIONARY)
+          .end(function(err, resultz) {
+          if(err) {
+            console.log(err);
+          } else {
+            console.log(resultz.text)
+            var xml = resultz.text;
+            parseString(xml, function (err, resultzz) {
+              console.log(resultzz);
+              console.log(resultzz.def.dt);
+              client.sms.messages.create({
+                to: req.body.From,
+                from: process.env.PHONE_NUMBER,
+                body: resultzz.def.dt
+              }, function(error, message) {
+                if (error) {
+                  console.log(error)
+                } else {
+                  console.log('success')
+                }
+              });
+            });
+          }
+        })
+    } else if(body.indexOf('to') > 0 && body.split(' ').length >= 3 && /^[a-z0-9]+$/i.test(body.charAt(0))) {
       var origin = body.substring(0, body.indexOf('to'))
       var destination = body.substring(body.indexOf('to'))
 
