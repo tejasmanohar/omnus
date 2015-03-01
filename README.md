@@ -1,3 +1,3 @@
-# call-stream
+# omnus
 
-internet-less productivity toolkit
+offline mobile music streaming
