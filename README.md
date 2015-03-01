@@ -20,7 +20,7 @@ So... how does that all work?
 * MP4 -> MP3 - [FFmpeg]
 * API Server - [express]
 
-For any more detail, use the [source], Luke ;)
+For more details, use the [source], Luke ;)
 
 
 ## Why?
