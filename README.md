@@ -17,7 +17,7 @@ So... how does all that work?
 * SMS and phone calling done - [Twilio]
 * YouTube searches - [YouTube API]
 * YouTube downloads - [youtube-dl] 
-* MP4 -> MP3 - [FFmpeg]
+* MP4 to MP3 - [FFmpeg]
 * API Server - [express]
 
 For more details, use the [source], Luke ;)
