@@ -12,7 +12,7 @@ Here's a step-by-step overview:
 3. Downloads media source, stripping all but audio
 4. Streams MP3 over returned call to initiator
 
-So... how does that all work?
+So... how does all that work?
 
 * SMS and phone calling done - [Twilio]
 * YouTube searches - [YouTube API]
