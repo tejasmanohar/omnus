@@ -68,7 +68,7 @@ With mobile data being so expensive, I wanted to create a workaround to listen t
 
 Omnus is Copyright 2015 Tejas Manohar.
 
-Licensed under the **[MIT License] [license]**;
+Licensed under the **[MIT License] [license]**.
 
 
 [Twilio]: https://www.twilio.com
