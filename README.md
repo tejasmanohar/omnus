@@ -1,10 +1,6 @@
 # Omnus
 
-offline mobile music streaming
-
-# Omnus
-
-An offline mobile music streaming service in Node.js.
+An offline mobile music streaming service.
 
 
 ## How?
