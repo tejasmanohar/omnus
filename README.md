@@ -12,13 +12,15 @@ Here's a step-by-step overview:
 3. Downloads media source, stripping all but audio
 4. Streams MP3 over returned call to initiator
 
-What does what?
+So... how does that all work?
 
 * SMS and phone calling done - [Twilio]
 * YouTube searches - [YouTube API]
 * YouTube downloads - [youtube-dl] 
 * MP4 -> MP3 - [FFmpeg]
 * API Server - [express]
+
+For any more detail, use the [source], Luke ;)
 
 
 ## Why?
@@ -31,4 +33,5 @@ With mobile data being so expensive, I wanted to create a workaround to listen t
 [youtube-dl]: http://rg3.github.io/youtube-dl
 [FFmpeg]: https://www.ffmpeg.org
 [express]: http://expressjs.com
+[source]: https://github.com/tejasmanohar/omnus/blob/master/app.js
 [Twilio's voice pricing]: https://www.twilio.com/voice/pricing
