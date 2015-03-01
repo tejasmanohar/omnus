@@ -25,7 +25,7 @@ For more details, use the [source], Luke ;)
 
 ## Installation
 
-Assuming you have `git` installed, then just clone it, and navigate to the directory:
+Clone the repo, and navigate to your local copy:
 
     git clone https://github.com/tejasmanohar/omnus.git && cd omnus
 
