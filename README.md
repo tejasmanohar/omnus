@@ -23,6 +23,42 @@ So... how does all that work?
 For more details, use the [source], Luke ;)
 
 
+## Installation
+
+Assuming you have `git` installed, then just clone it, and navigate to the directory:
+
+    git clone https://github.com/tejasmanohar/omnus.git && cd omnus
+
+Install dependencies:
+
+    npm install
+
+
+## Usage
+
+Expose your routes with a public web address. I use [ngrok]:
+
+    ngrok 3000
+
+Make an account with [Twilio], register a phone number, and set the domain + `/receive` (ex: [http://example.ngrok/receive](http://example.ngrok/receive)) as the
+> Messaging Request URL w/ *HTTP POST* setting.
+
+![Twilio Screenshot](http://i.imgur.com/3XPeI4T.png)
+
+Source the following variables in your environment (with real information)
+
+>TWILIO_AUTH_SID=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+TWILIO_AUTH_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+PHONE_NUMBER=+XXXXXXXX
+BASE_URL=example.ngrok.com
+
+Start the server:
+
+    node app.js
+
+Use it, hack it, share it!
+
+
 ## Why?
 
 With mobile data being so expensive, I wanted to create a workaround to listen to music. I have come to realize that [Twilio's voice pricing] so expensive, it's not a practical solution to release (even in a SaaS model). That said, it's still pretty freaking amazing that you can mimic the functionality of an [Rdio](http://www.rdio.com/home/en-us/) or [Spotify](https://www.spotify.com/us/) MVP without internet in under 100 lines of code.
