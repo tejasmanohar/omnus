@@ -41,16 +41,16 @@ Expose your routes with a public web address. I use [ngrok]:
     ngrok 3000
 
 Make an account with [Twilio], register a phone number, and set the domain + `/receive` (ex: [http://example.ngrok/receive](http://example.ngrok/receive)) as the
-> Messaging Request URL w/ *HTTP POST* setting.
+> Messaging Request URL w/ HTTP POST setting.
 
 ![Twilio Screenshot](http://i.imgur.com/3XPeI4T.png)
 
 Source the following variables in your environment (with real information)
 
->TWILIO_AUTH_SID=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-TWILIO_AUTH_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-PHONE_NUMBER=+XXXXXXXX
-BASE_URL=example.ngrok.com
+    TWILIO_AUTH_SID=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    TWILIO_AUTH_TOKEN=XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+    PHONE_NUMBER=+XXXXXXXX
+    BASE_URL=example.ngrok.com
 
 Start the server:
 
