@@ -1,3 +1,6 @@
+var dotenv = require('dotenv');
+dotenv.load();
+
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
