@@ -1,32 +1,23 @@
 {
-  "name": "call-stream",
-  "version": "1.0.0",
-  "description": "stream music offline over phone call",
+  "name": "omnus",
+  "version": "0.0.0",
+  "description": "offline mobile music streaming",
   "main": "app.js",
   "repository": {
     "type": "git",
-    "url": "git://github.com/tejasmanohar/call-stream.git"
+    "url": "git://github.com/tejasmanohar/omnus.git"
   },
   "author": "Tejas Manohar",
   "license": "AGPL",
   "bugs": {
-    "url": "https://github.com/tejasmanohar/call-stream/issues"
+    "url": "https://github.com/tejasmanohar/omnus/issues"
   },
-  "homepage": "https://github.com/tejasmanohar/call-stream",
+  "homepage": "https://github.com/tejasmanohar/omnus",
   "dependencies": {
-    "bingtranslator": "0.0.7",
-    "body-parser": "^1.10.1",
-    "dotenv": "^0.4.0",
-    "express": "^4.11.0",
-    "node-wit": "^1.1.0",
-    "random-word": "^1.0.0",
-    "request": "^2.51.0",
-    "shelljs": "^0.3.0",
-    "superagent": "^0.21.0",
-    "twilio": "^1.10.0",
-    "weather": "^0.1.0",
-    "weather-js": "^1.0.1",
-    "xml2js": "^0.4.4",
-    "yandex-translate": "^1.0.1"
+    "body-parser": "1.12.0",
+    "express": "4.12.0",
+    "shelljs": "0.3.0",
+    "superagent": "0.21.0",
+    "twilio": "1.11.1",
   }
 }

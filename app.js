@@ -1,6 +1,3 @@
-var dotenv = require('dotenv');
-dotenv.load();
-
 var express = require('express');
 var app = express();
 var server = require('http').createServer(app);
@@ -15,7 +12,6 @@ var request = require('superagent');
 var twilio = require('twilio');
 
 require('shelljs/global');
-var parseString = require('xml2js').parseString;
 var client = new twilio.RestClient(process.env.TWILIO_AUTH_SID, process.env.TWILIO_AUTH_TOKEN);
 
 var port = process.env.PORT || 3000;
