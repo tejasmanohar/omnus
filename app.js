@@ -19,12 +19,9 @@ server.listen(port);
 console.log('Listening at port: ' + port);
 
 app.post('/incoming', function(req, res) {
-  var body = req.body.Body;
-  if(body.substring(0,4) === 'play') {
-    searchMusic(data.outcomes[0].entities.song_name[0].value, function(url) {
-      startCall(url, req.body.From);
-    });
-  }
+  searchMusic(req.body.Body, function(url) {
+    startCall(url, req.body.From);
+  });
 });
 
 app.post('/xml/:id', function(req, res) {
