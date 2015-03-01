@@ -15,9 +15,10 @@
   "homepage": "https://github.com/tejasmanohar/omnus",
   "dependencies": {
     "body-parser": "1.12.0",
+    "dotenv": "0.5.1",
     "express": "4.12.0",
     "shelljs": "0.3.0",
     "superagent": "0.21.0",
-    "twilio": "1.11.1",
+    "twilio": "1.11.1"
   }
 }
