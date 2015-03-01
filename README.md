@@ -1,6 +1,6 @@
 # Omnus
 
-An offline mobile music streaming service.
+An offline mobile music streaming server.
 
 
 ## How?
