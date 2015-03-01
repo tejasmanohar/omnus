@@ -64,6 +64,14 @@ Use it, hack it, share it!
 With mobile data being so expensive, I wanted to create a workaround to listen to music. I have come to realize that [Twilio's voice pricing] so expensive, it's not a practical solution to release (even in a SaaS model). That said, it's still pretty freaking amazing that you can mimic the functionality of an [Rdio](http://www.rdio.com/home/en-us/) or [Spotify](https://www.spotify.com/us/) MVP without internet in under 100 lines of code.
 
 
+## License
+
+Omnus is Copyright 2015 Tejas Manohar.
+
+Licensed under the **[MIT License] [license]**;
+you may only use this software in compliance with the License.
+
+
 [Twilio]: https://www.twilio.com
 [YouTube API]: https://developers.google.com/youtube/v3/docs
 [youtube-dl]: http://rg3.github.io/youtube-dl
